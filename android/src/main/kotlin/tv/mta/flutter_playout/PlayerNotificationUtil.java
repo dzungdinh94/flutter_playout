@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -34,16 +36,18 @@ public class PlayerNotificationUtil  {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationChannelId);
 
-        int smallIcon = context.getResources().getIdentifier(
-                "ic_notification_icon", "drawable", context.getPackageName());
+//        int smallIcon = context.getResources().getIdentifier(
+//                "ic_notification_icon", "drawable", context.getPackageName());
+        Bitmap largeImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 
         builder.setContentTitle(description.getTitle())
                 .setContentText(description.getSubtitle())
-                .setLargeIcon(description.getIconBitmap())
+                .setLargeIcon(largeImage)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken()))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setSmallIcon(smallIcon)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setOngoing(true)
                 .setDeleteIntent(getActionIntent(context, KeyEvent.KEYCODE_MEDIA_STOP));
 
         Intent intent = new Intent(context, activity.getClass());

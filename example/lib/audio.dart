@@ -195,6 +195,7 @@ class _AudioPlayout extends State<AudioPlayout> with PlayerObserver {
         title: widget.title,
         subtitle: widget.subtitle,
         position: currentPlaybackPosition,
+        largeIamgeUrl: "http://demo.fighttech.vn/app-english/ic_launcher.png",
         isLiveStream: true);
     setState(() {
       audioPlayerState = PlayerState.PLAYING;

@@ -8,6 +8,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -35,6 +37,11 @@ import com.google.android.exoplayer2.util.Util;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.JSONMethodCodec;
@@ -43,6 +50,7 @@ import tv.mta.flutter_playout.MediaNotificationManagerService;
 import tv.mta.flutter_playout.PlayerNotificationUtil;
 import tv.mta.flutter_playout.PlayerState;
 import tv.mta.flutter_playout.R;
+import tv.mta.flutter_playout.Utils;
 
 public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventChannel.StreamHandler {
 
@@ -104,6 +112,8 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
     private String subtitle = "";
 
+    private String largeImageUrl = "";
+
     private boolean autoPlay = false;
 
     private long mediaDuration = 0L;
@@ -133,6 +143,10 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
             try {
                 this.subtitle = args.getString("subtitle");
+            } catch (Exception e) { /* ignore */ }
+
+            try {
+                this.largeImageUrl = args.getString("largeImageUrl");
             } catch (Exception e) { /* ignore */ }
 
             try {
@@ -225,6 +239,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
                 .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
                 .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, Utils.getBitmapFromURL(largeImageUrl))
                 .build();
 
         mMediaSessionCompat.setMetadata(metadata);
@@ -591,6 +606,8 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
                 this.title = args.getString("title");
 
                 this.subtitle = args.getString("description");
+
+                this.largeImageUrl = args.getString("largeImageUrl");
 
                 /* Produces DataSource instances through which media data is loaded. */
                 DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,

@@ -6,6 +6,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
@@ -22,11 +24,15 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import tv.mta.flutter_playout.FlutterAVPlayer;
 import tv.mta.flutter_playout.PlayerNotificationUtil;
 import tv.mta.flutter_playout.PlayerState;
 import tv.mta.flutter_playout.R;
+import tv.mta.flutter_playout.Utils;
 
 public class AudioServiceBinder extends Binder implements FlutterAVPlayer, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
@@ -57,6 +63,8 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
     private String title;
 
     private String subtitle;
+
+    private String largeImageUrl;
 
     private boolean streamAudio = false;
 
@@ -120,6 +128,10 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
         this.subtitle = subtitle;
     }
 
+    public void setLargeImageUrl(String largeImageUrl) {
+        this.largeImageUrl = largeImageUrl;
+    }
+
     public boolean isStreamAudio() {
         return streamAudio;
     }
@@ -164,6 +176,7 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
         MediaMetadataCompat metadata = new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
                 .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, Utils.getBitmapFromURL(largeImageUrl))
                 .build();
 
         mMediaSessionCompat.setMetadata(metadata);

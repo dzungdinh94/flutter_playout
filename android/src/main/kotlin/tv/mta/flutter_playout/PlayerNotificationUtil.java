@@ -15,6 +15,11 @@ import android.view.KeyEvent;
 
 import androidx.core.app.NotificationCompat;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class PlayerNotificationUtil  {
 
     /**
@@ -38,11 +43,11 @@ public class PlayerNotificationUtil  {
 
         int smallIcon = context.getResources().getIdentifier(
                 "ic_launcher", "mipmap", context.getPackageName());
-        Bitmap largeImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+        Bitmap largeImage = BitmapFactory.decodeResource(context.getResources(), smallIcon);
 
         builder.setContentTitle(description.getTitle())
                 .setContentText(description.getSubtitle())
-                .setLargeIcon(largeImage)
+                .setLargeIcon(getLargeIamgeBitmap(description.getIconBitmap(), context))
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken()))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -70,5 +75,12 @@ public class PlayerNotificationUtil  {
         intent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, mediaKeyEvent));
 
         return PendingIntent.getBroadcast(context, mediaKeyEvent, intent, 0);
+    }
+
+    private static Bitmap getLargeIamgeBitmap(Bitmap fromDes, Context context){
+        if(fromDes == null) {
+            return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_play_default);
+        }
+        return fromDes;
     }
 }

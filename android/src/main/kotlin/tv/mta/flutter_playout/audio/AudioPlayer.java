@@ -40,6 +40,8 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
     private String subtitle;
 
+    private String largeImageUrl;
+
     private int startPositionInMills;
 
     private int mediaDuration = 0;
@@ -164,6 +166,8 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
             audioServiceBinder.setSubtitle(subtitle);
 
+            audioServiceBinder.setLargeImageUrl(largeImageUrl);
+
             audioServiceBinder.setAudioProgressUpdateHandler(audioProgressUpdateHandler);
 
             audioServiceBinder.startAudio(startPositionInMills);
@@ -239,6 +243,8 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
         this.subtitle = (String) args.get("subtitle");
 
+        this.largeImageUrl = (String) args.get("largeImageUrl");
+
         try {
 
             this.startPositionInMills = (int) args.get("position");
@@ -265,6 +271,8 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
             audioServiceBinder.setTitle(this.title);
 
             audioServiceBinder.setSubtitle(this.subtitle);
+
+            audioServiceBinder.setLargeImageUrl(this.largeImageUrl);
 
             audioServiceBinder.startAudio(startPositionInMills);
 

@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import androidx.annotation.NonNull;
@@ -53,6 +54,7 @@ import tv.mta.flutter_playout.R;
 import tv.mta.flutter_playout.Utils;
 
 public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventChannel.StreamHandler {
+    private final String TAG = "PlayerLayout";
 
     public static SimpleExoPlayer activePlayer;
 
@@ -431,12 +433,12 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
         @Override
         public void onPause() {
-            mPlayerView.setPlayWhenReady(false);
+            pause();
         }
 
         @Override
         public void onPlay() {
-            mPlayerView.setPlayWhenReady(true);
+            play();
         }
 
         @Override
@@ -446,7 +448,19 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
         @Override
         public void onStop() {
+            pause();
+        }
+    }
+
+    public void pause() {
+        if (mPlayerView != null) {
             mPlayerView.setPlayWhenReady(false);
+        }
+    }
+
+    public void play() {
+        if (mPlayerView != null) {
+            mPlayerView.setPlayWhenReady(true);
         }
     }
 
@@ -471,9 +485,13 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
                 message.put("offset", eventTime.currentPlaybackPositionMs / 1000);
 
+                Log.d(TAG, "onSeek: [position=" + beforeSeek + "] [offset=" +
+                        eventTime.currentPlaybackPositionMs / 1000 + "]");
                 eventSink.success(message);
 
-            } catch (Exception e) { /* ignore */ }
+            } catch (Exception e) {
+                Log.e(TAG, "onSeek: ", e);
+            }
         }
 
         @Override
@@ -496,9 +514,12 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
                 message.put("error", errorMessage);
 
+                Log.d(TAG, "onError: [errorMessage=" + errorMessage + "]");
                 eventSink.success(message);
 
-            } catch (Exception e) { /* ignore */ }
+            } catch (Exception e) {
+                Log.e(TAG, "onError: ", e);
+            }
         }
 
         @Override
@@ -516,9 +537,12 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
                         message.put("name", "onPlay");
 
+                        Log.d(TAG, "onPlay: []");
                         eventSink.success(message);
 
-                    } catch (Exception e) { /* ignore */ }
+                    } catch (Exception e) {
+                        Log.e(TAG, "onPlay: ", e);
+                    }
 
                 } else {
 
@@ -530,9 +554,12 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
                         message.put("name", "onPause");
 
+                        Log.d(TAG, "onPause: []");
                         eventSink.success(message);
 
-                    } catch (Exception e) { /* ignore */ }
+                    } catch (Exception e) {
+                        Log.e(TAG, "onPause: ", e);
+                    }
 
                 }
 
@@ -548,9 +575,12 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
                     message.put("name", "onComplete");
 
+                    Log.d(TAG, "onComplete: []");
                     eventSink.success(message);
 
-                } catch (Exception e) { /* ignore */ }
+                } catch (Exception e) {
+                    Log.e(TAG, "onComplete: ", e);
+                }
 
             }
         }
@@ -575,10 +605,13 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
                         message.put("time", mPlayerView.getCurrentPosition() / 1000);
 
+                        Log.d(TAG, "onTime: [time=" + mPlayerView.getCurrentPosition() / 1000 + "]");
                         eventSink.success(message);
                     }
 
-                } catch (Exception e) { /* ignore */ }
+                } catch (Exception e) {
+                    Log.e(TAG, "onTime: ", e);
+                }
 
                 onDuration();
 
@@ -630,7 +663,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
             long newDuration = mPlayerView.getDuration();
 
-            if (newDuration != mediaDuration) {
+            if (newDuration != mediaDuration && eventSink != null) {
 
                 mediaDuration = newDuration;
 
@@ -640,10 +673,13 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
                 message.put("duration", mediaDuration);
 
+                Log.d(TAG, "onDuration: [duration=" + mediaDuration + "]");
                 eventSink.success(message);
             }
 
-        } catch (Exception e) { /* ignore */ System.out.println(e); }
+        } catch (Exception e) {
+            Log.e(TAG, "onDuration: " + e.getMessage(), e);
+        }
     }
 
     @Override

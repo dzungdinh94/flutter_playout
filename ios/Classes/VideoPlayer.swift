@@ -151,6 +151,14 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
                 
                 result(true)
             }
+                
+            else if ("resume" == call.method) {
+                self.play()
+            }
+                
+            else if ("pause" == call.method) {
+                self.pause()
+            }
             
             /* dispose */
             else if ("dispose" == call.method) {
@@ -168,7 +176,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     /* create player view */
     func view() -> UIView {
         
-        if let videoURL = URL(string: self.url) {
+        if let videoURL = URL(string: self.url.trimmingCharacters(in: .whitespacesAndNewlines)) {
             
             do {
                 let audioSession = AVAudioSession.sharedInstance()
@@ -178,6 +186,11 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
             
             /* Create the asset to play */
             let asset = AVAsset(url: videoURL)
+            
+            /* not a valid playback asset */
+            if (!asset.isPlayable) {
+                return UIView()
+            }
 
             /* Create a new AVPlayerItem with the asset and
              an array of asset keys to be automatically loaded */
@@ -499,8 +512,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     
     public func dispose() {
         
-        /* stop playback */
-        pause()
+        self.player?.pause()
         
         /* clear lock screen metadata */
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
@@ -517,15 +529,16 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
             try audioSession.setActive(false)
         } catch _ { }
         
-        /* clear player reference */
-        if self.player != nil {
-            self.player?.pause()
-            self.player = nil
-        }
+        self.player?.removeObserver(self, forKeyPath: #keyPath(AVPlayer.status))
+        self.player?.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status))
+        self.player?.removeObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus))
+        
+        self.player?.flutterEventSink = nil
         
         self.flutterEventSink = nil
-        self.player?.flutterEventSink = nil
         self.eventChannel?.setStreamHandler(nil)
+        
+        self.player = nil
     }
     
     /**

@@ -4,108 +4,144 @@ Below is an example app showcasing both video and audio players from this plugin
 ## main.dart
 ```dart
 import 'package:flutter/material.dart';
-
+import 'package:flutter_playout/player_state.dart';
 import 'package:flutter_playout_example/audio.dart';
 import 'package:flutter_playout_example/video.dart';
 
-void main() => runApp(PlayoutExample());
+void main() => runApp(MainApp());
 
-class PlayoutExample extends StatelessWidget {
+class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "AV Playout",
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          brightness: Brightness.dark,
-          backgroundColor: Colors.grey[900],
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {},
-          ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.favorite),
-              onPressed: () {},
+      home: PlayoutExample(),
+    );
+  }
+}
+
+class PlayoutExample extends StatefulWidget {
+  @override
+  _PlayoutExampleState createState() => _PlayoutExampleState();
+}
+
+class _PlayoutExampleState extends State<PlayoutExample> {
+  PlayerState _desiredState = PlayerState.PLAYING;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        brightness: Brightness.dark,
+        backgroundColor: Colors.grey[900],
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {},
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.favorite),
+            onPressed: () async {
+              // pause playback
+              setState(() {
+                _desiredState = PlayerState.PAUSED;
+              });
+              // wait for user to come back from navigated screen
+              await Navigator.push(context, MaterialPageRoute<void>(
+                builder: (context) {
+                  return Scaffold(
+                    appBar: AppBar(),
+                    body: Container(
+                      child: Center(
+                        child: Text("Second Screen"),
+                      ),
+                    ),
+                  );
+                },
+              ));
+              // user is back. resume playback
+              setState(() {
+                _desiredState = PlayerState.PLAYING;
+              });
+            },
+          )
+        ],
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              Icons.local_play,
+              color: Colors.white,
+            ),
+            Container(
+              width: 7.0,
+            ),
+            Text(
+              "AV Player",
+              style: Theme.of(context)
+                  .textTheme
+                  .title
+                  .copyWith(color: Colors.white),
             )
           ],
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Icon(
-                Icons.local_play,
-                color: Colors.white,
-              ),
-              Container(
-                width: 7.0,
-              ),
-              Text(
-                "AV Player",
-                style: Theme.of(context)
-                    .textTheme
-                    .title
-                    .copyWith(color: Colors.white),
-              )
-            ],
-          ),
         ),
-        body: Container(
-          color: Colors.black,
-          child: CustomScrollView(
-            slivers: <Widget>[
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(17.0, 33.0, 17.0, 0.0),
-                  child: Text(
-                    "Video Player",
-                    style: Theme.of(context).textTheme.display1.copyWith(
-                        color: Colors.pink[500], fontWeight: FontWeight.w600),
-                  ),
+      ),
+      body: Container(
+        color: Colors.black,
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.fromLTRB(17.0, 33.0, 17.0, 0.0),
+                child: Text(
+                  "Video Player",
+                  style: Theme.of(context).textTheme.display1.copyWith(
+                      color: Colors.pink[500], fontWeight: FontWeight.w600),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(17.0, 0.0, 17.0, 30.0),
-                  child: Text(
-                    "Plays video from a URL with background audio support and lock screen controls.",
-                    style: Theme.of(context).textTheme.subhead.copyWith(
-                        color: Colors.white70, fontWeight: FontWeight.w400),
-                  ),
+            ),
+            SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.fromLTRB(17.0, 0.0, 17.0, 30.0),
+                child: Text(
+                  "Plays video from a URL with background audio support and lock screen controls.",
+                  style: Theme.of(context).textTheme.subhead.copyWith(
+                      color: Colors.white70, fontWeight: FontWeight.w400),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: VideoPlayout(),
-              ),
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(17.0, 23.0, 17.0, 0.0),
-                  child: Text(
-                    "Audio Player",
-                    style: Theme.of(context).textTheme.display1.copyWith(
-                        color: Colors.pink[500], fontWeight: FontWeight.w600),
-                  ),
+            ),
+            SliverToBoxAdapter(
+                child: VideoPlayout(
+              desiredState: _desiredState,
+            )),
+            SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.fromLTRB(17.0, 23.0, 17.0, 0.0),
+                child: Text(
+                  "Audio Player",
+                  style: Theme.of(context).textTheme.display1.copyWith(
+                      color: Colors.pink[500], fontWeight: FontWeight.w600),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(17.0, 0.0, 17.0, 30.0),
-                  child: Text(
-                    "Plays audio from a URL with background audio support and lock screen controls.",
-                    style: Theme.of(context).textTheme.subhead.copyWith(
-                        color: Colors.white70, fontWeight: FontWeight.w400),
-                  ),
+            ),
+            SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.fromLTRB(17.0, 0.0, 17.0, 30.0),
+                child: Text(
+                  "Plays audio from a URL with background audio support and lock screen controls.",
+                  style: Theme.of(context).textTheme.subhead.copyWith(
+                      color: Colors.white70, fontWeight: FontWeight.w400),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: AudioPlayout(),
-              ),
-            ],
-          ),
+            ),
+            SliverToBoxAdapter(
+              child: AudioPlayout(),
+            ),
+          ],
         ),
       ),
     );
@@ -120,21 +156,27 @@ class PlayoutExample extends StatelessWidget {
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_playout/player_observer.dart';
+import 'package:flutter_playout/player_state.dart';
 import 'package:flutter_playout/video.dart';
 
 class VideoPlayout extends StatelessWidget with PlayerObserver {
+  final PlayerState desiredState;
+
+  const VideoPlayout({Key key, this.desiredState}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: Video(
-          autoPlay: false,
+          autoPlay: true,
           title: "MTA International",
           subtitle: "Reaching The Corners Of The Earth",
-          isLiveStream: false,
+          isLiveStream: true,
           url: "https://your_video_stream.com/stream_test.m3u8",
           onViewCreated: _onViewCreated,
+          desiredState: desiredState,
         ),
       ),
     );
@@ -213,6 +255,7 @@ class AudioPlayout extends StatefulWidget {
 class _AudioPlayout extends State<AudioPlayout> with PlayerObserver {
   Audio _audioPlayer;
   PlayerState audioPlayerState = PlayerState.STOPPED;
+  bool _loading = false;
 
   Duration duration = Duration(milliseconds: 1);
   Duration currentPlaybackPosition = Duration.zero;
@@ -243,6 +286,7 @@ class _AudioPlayout extends State<AudioPlayout> with PlayerObserver {
   void onPlay() {
     setState(() {
       audioPlayerState = PlayerState.PLAYING;
+      _loading = false;
     });
   }
 
@@ -255,7 +299,10 @@ class _AudioPlayout extends State<AudioPlayout> with PlayerObserver {
 
   @override
   void onComplete() {
-    stop();
+    setState(() {
+      audioPlayerState = PlayerState.PAUSED;
+      currentPlaybackPosition = Duration.zero;
+    });
   }
 
   @override
@@ -299,36 +346,55 @@ class _AudioPlayout extends State<AudioPlayout> with PlayerObserver {
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           Row(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              IconButton(
-                splashColor: Colors.transparent,
-                icon: Icon(
-                  isPlaying
-                      ? Icons.pause_circle_filled
-                      : Icons.play_circle_filled,
-                  color: Colors.white,
-                  size: 50,
+              Container(
+                padding: EdgeInsets.fromLTRB(0.0, 11.0, 0.0, 0.0),
+                margin: EdgeInsets.all(7.0),
+                child: Stack(
+                  children: <Widget>[
+                    IconButton(
+                      padding: EdgeInsets.all(0.0),
+                      splashColor: Colors.transparent,
+                      icon: Icon(
+                        isPlaying
+                            ? Icons.pause_circle_filled
+                            : Icons.play_circle_filled,
+                        color: Colors.white,
+                        size: 47,
+                      ),
+                      onPressed: () {
+                        if (isPlaying) {
+                          pause();
+                        } else {
+                          play();
+                        }
+                      },
+                    ),
+                    _loading
+                        ? Positioned.fill(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            ),
+                          )
+                        : Container(),
+                  ],
                 ),
-                onPressed: () {
-                  if (isPlaying) {
-                    pause();
-                  } else {
-                    play();
-                  }
-                },
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.fromLTRB(20.0, 11.0, 5.0, 3.0),
+                    padding: EdgeInsets.fromLTRB(7.0, 11.0, 5.0, 3.0),
                     child: Text(widget.title,
                         style:
                             TextStyle(fontSize: 11, color: Colors.grey[100])),
                   ),
                   Container(
-                    padding: EdgeInsets.fromLTRB(20.0, 0.0, 5.0, 0.0),
+                    padding: EdgeInsets.fromLTRB(7.0, 0.0, 5.0, 0.0),
                     child: Text(widget.subtitle,
                         style: TextStyle(fontSize: 19, color: Colors.white)),
                   ),
@@ -381,17 +447,18 @@ class _AudioPlayout extends State<AudioPlayout> with PlayerObserver {
 
   // Request audio play
   Future<void> play() async {
+    setState(() {
+      _loading = true;
+    });
     // here we send position in case user has scrubbed already before hitting
     // play in which case we want playback to start from where user has
     // requested
+    print(currentPlaybackPosition);
     _audioPlayer.play(widget.url,
         title: widget.title,
         subtitle: widget.subtitle,
         position: currentPlaybackPosition,
         isLiveStream: true);
-    setState(() {
-      audioPlayerState = PlayerState.PLAYING;
-    });
   }
 
   // Request audio pause

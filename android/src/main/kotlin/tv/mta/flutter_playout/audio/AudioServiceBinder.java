@@ -66,6 +66,8 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
 
     private String largeImageUrl;
 
+    private boolean isLoadingMode = false;
+
     private boolean streamAudio = false;
 
     private MediaPlayer audioPlayer = null;
@@ -132,6 +134,11 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
         this.largeImageUrl = largeImageUrl;
     }
 
+    public void setIsLoadingMode(Boolean isLoadingMode) {
+        this.isLoadingMode = isLoadingMode;
+    }
+
+
     public boolean isStreamAudio() {
         return streamAudio;
     }
@@ -182,7 +189,9 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
         mMediaSessionCompat.setMetadata(metadata);
     }
 
-    public void startAudio(int startPositionInMills) {
+    public void startAudio(int startPositionInMills, boolean isLoadingMode) {
+
+        this.isLoadingMode = isLoadingMode;
 
         this.startPositionInMills = startPositionInMills;
 
@@ -335,7 +344,11 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
             mp.seekTo(startPositionInMills);
         }
 
-        mp.start();
+        if(!isLoadingMode) {
+            mp.start();
+        } else {
+            setIsLoadingMode(false);
+        }
 
         ComponentName receiver = new ComponentName(context.getPackageName(),
                 RemoteReceiver.class.getName());

@@ -42,6 +42,8 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
     private String largeImageUrl;
 
+    private boolean isLoadingMode = false;
+
     private int startPositionInMills;
 
     private int mediaDuration = 0;
@@ -170,7 +172,9 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
             audioServiceBinder.setAudioProgressUpdateHandler(audioProgressUpdateHandler);
 
-            audioServiceBinder.startAudio(startPositionInMills);
+            audioServiceBinder.startAudio(startPositionInMills, isLoadingMode);
+
+            isLoadingMode = false;
 
             doBindMediaNotificationManagerService();
         }
@@ -245,6 +249,8 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
         this.largeImageUrl = (String) args.get("largeImageUrl");
 
+        this.isLoadingMode = (boolean) args.get("isLoadingMode");
+
         try {
 
             this.startPositionInMills = (int) args.get("position");
@@ -274,7 +280,11 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
             audioServiceBinder.setLargeImageUrl(this.largeImageUrl);
 
-            audioServiceBinder.startAudio(startPositionInMills);
+            audioServiceBinder.setIsLoadingMode(this.isLoadingMode);
+
+            audioServiceBinder.startAudio(startPositionInMills, this.isLoadingMode);
+
+            isLoadingMode = false;
 
         } else {
 

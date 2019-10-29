@@ -19,14 +19,16 @@ class Audio {
       String subtitle = "",
       Duration position = Duration.zero,
       bool isLiveStream = false,
-      String largeIamgeUrl = ""}) async {
+      String largeIamgeUrl = "",
+      bool isLoadingMode = false}) async {
     await _audioChannel.invokeMethod("play", <String, dynamic>{
       "url": url,
       "title": title,
       "subtitle": subtitle,
       "position": position.inMilliseconds,
       "isLiveStream": isLiveStream,
-      "largeImageUrl": largeIamgeUrl
+      "largeImageUrl": largeIamgeUrl,
+      "isLoadingMode": isLoadingMode
     });
   }
 

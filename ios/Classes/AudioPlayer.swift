@@ -50,8 +50,17 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
                           if let position = arguments["position"] as? Double {
                             
                             if let isLiveStream = arguments["isLiveStream"] as? Bool {
-                                
-                                setup(title: title, subtitle: subtitle, position: position, url: audioURL, isLiveStream: isLiveStream)
+                                // background thread not block UI 
+                                // https://stackoverflow.com/questions/24056205/how-to-use-background-thread-in-swift
+                                let thiss = self;
+                                DispatchQueue.global(qos: .background).async {
+                                    // print("This is run on the background queue")
+                                    thiss.setup(title: title, subtitle: subtitle, position: position, url: audioURL, isLiveStream: isLiveStream)
+                                    
+                                    // DispatchQueue.main.async {
+                                    //     print("This is run on the main queue, after the previous code in outer block")
+                                    // }
+                                }
                             }
                           }
                       }

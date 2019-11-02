@@ -339,8 +339,8 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
         
         pause()
         
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
-        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
+        print("teardown-----------------------------")
         if let timeObserver = timeObserverToken {
             //audioPlayer.removeTimeObserver(timeObserver)
             timeObserverToken = nil
@@ -382,11 +382,11 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
     
     private func updateInfoPanelOnPlay() {
         
-        self.nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = CMTimeGetSeconds(((self.audioPlayer.currentTime())))
+        MPNowPlayingInfoCenter.default().nowPlayingInfo![MPNowPlayingInfoPropertyElapsedPlaybackTime] = CMTimeGetSeconds(((self.audioPlayer.currentTime())))
         
-        self.nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1
+        MPNowPlayingInfoCenter.default().nowPlayingInfo![MPNowPlayingInfoPropertyPlaybackRate] = 1
         
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = self.nowPlayingInfo
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     
     private func updateInfoPanelOnComplete() {

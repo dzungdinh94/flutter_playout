@@ -199,7 +199,11 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
 
         if (audioPlayer != null && mMediaSessionCompat != null && mMediaSessionCompat.isActive()) {
 
-            updatePlaybackState(PlayerState.PLAYING);
+            if(isLoadingMode) {
+                updatePlaybackState(PlayerState.PAUSED);
+            } else {
+                updatePlaybackState(PlayerState.PLAYING);
+            }
 
             // Create update audio player state message.
             Message updateAudioProgressMsg = new Message();
@@ -346,8 +350,6 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
 
         if(!isLoadingMode) {
             mp.start();
-        } else {
-            setIsLoadingMode(false);
         }
 
         ComponentName receiver = new ComponentName(context.getPackageName(),
@@ -366,7 +368,12 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
 
         setAudioMetadata();
 
-        updatePlaybackState(PlayerState.PLAYING);
+        if(isLoadingMode) {
+            updatePlaybackState(PlayerState.PAUSED);
+        } else {
+            setIsLoadingMode(false);
+            updatePlaybackState(PlayerState.PLAYING);
+        }
 
         /* This thread object will send update audio progress message to caller activity every 1 second */
         Thread updateAudioProgressThread = new Thread() {

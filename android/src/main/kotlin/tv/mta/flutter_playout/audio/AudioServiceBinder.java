@@ -89,6 +89,8 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
 
     public final int UPDATE_AUDIO_DURATION = 5;
 
+    public final int AUDIO_LOADING_COMPLETED = 6;
+
     boolean isBound = true;
 
     boolean isMediaChanging = false;
@@ -370,6 +372,12 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
 
         if(isLoadingMode) {
             updatePlaybackState(PlayerState.PAUSED);
+
+            Message updateAudioDurationMsg = new Message();
+
+            updateAudioDurationMsg.what = AUDIO_LOADING_COMPLETED;
+
+            audioProgressUpdateHandler.sendMessage(updateAudioDurationMsg);
         } else {
             setIsLoadingMode(false);
             updatePlaybackState(PlayerState.PLAYING);

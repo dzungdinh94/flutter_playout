@@ -44,6 +44,9 @@ mixin PlayerObserver {
   /// Override this method to get errors thrown by the player
   void onError(String error) {/* user implementation */}
 
+  /// Trigger when user play audio with loading mode and audio loading completed
+  void onLoadingCompleted() {/* user implementation */}
+
   void _processEvent(dynamic event) async {
     String eventName = event["name"];
 
@@ -88,6 +91,10 @@ mixin PlayerObserver {
 
       case "onError":
         onError(event["error"]);
+        break;
+
+      case "onLoadingCompleted":
+        onLoadingCompleted();
         break;
 
       default:

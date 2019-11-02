@@ -121,6 +121,8 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
                 } else if (msg.what == service.audioServiceBinder.UPDATE_AUDIO_DURATION) {
 
                     service.onDuration();
+                } else if (msg.what == service.audioServiceBinder.AUDIO_LOADING_COMPLETED) {
+                    service.notifyDartOnLoadingCompleted();
                 }
             }
         }
@@ -337,6 +339,18 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
             JSONObject message = new JSONObject();
 
             message.put("name", "onComplete");
+
+            eventSink.success(message);
+
+        } catch (Exception e) { /* ignore */ }
+    }
+
+    void notifyDartOnLoadingCompleted() {
+        try {
+
+            JSONObject message = new JSONObject();
+
+            message.put("name", "onLoadingCompleted");
 
             eventSink.success(message);
 

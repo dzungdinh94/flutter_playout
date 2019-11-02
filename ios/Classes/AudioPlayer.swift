@@ -50,17 +50,20 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
                           if let position = arguments["position"] as? Double {
                             
                             if let isLiveStream = arguments["isLiveStream"] as? Bool {
-                                // background thread not block UI 
-                                // https://stackoverflow.com/questions/24056205/how-to-use-background-thread-in-swift
-                                let thiss = self;
-                                DispatchQueue.global(qos: .background).async {
-                                    // print("This is run on the background queue")
-                                    thiss.setup(title: title, subtitle: subtitle, position: position, url: audioURL, isLiveStream: isLiveStream)
-                                    
-                                    // DispatchQueue.main.async {
-                                    //     print("This is run on the main queue, after the previous code in outer block")
-                                    // }
-                                }
+
+                                if let isLoadingMode = arguments["isLoadingMode"] as? Bool {
+                                    // background thread not block UI 
+                                    // https://stackoverflow.com/questions/24056205/how-to-use-background-thread-in-swift
+                                    let thiss = self;
+                                    DispatchQueue.global(qos: .background).async {
+                                        // print("This is run on the background queue")
+                                        thiss.setup(title: title, subtitle: subtitle, position: position, url: audioURL, isLiveStream: isLiveStream, isLoadingMode: isLoadingMode)
+                                        
+                                        // DispatchQueue.main.async {
+                                        //     print("This is run on the main queue, after the previous code in outer block")
+                                        // }
+                                    }
+                                }   
                             }
                           }
                       }
@@ -123,7 +126,7 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
     
     private var mediaURL = ""
     
-    private func setup(title:String, subtitle:String, position:Double, url: String?, isLiveStream:Bool) {
+    private func setup(title:String, subtitle:String, position:Double, url: String?, isLiveStream:Bool, isLoadingMode:Bool) {
 
         do {
             let audioSession = AVAudioSession.sharedInstance()
@@ -165,8 +168,11 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
             }
             
             mediaURL = audioURL
-            
-            audioPlayer.play()
+            if (isLoadingMode) {
+                self.flutterEventSink?(["name":"onLoadingCompleted"])
+            } else {
+                audioPlayer.play()
+            }
         }
     }
     

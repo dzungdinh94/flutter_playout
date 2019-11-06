@@ -294,6 +294,14 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
             } else {
 
                 audioPlayer.start();
+                if(startPositionInMills > 0) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        audioPlayer.seekTo(startPositionInMills, MediaPlayer.SEEK_CLOSEST);
+                    }
+                    else {
+                        audioPlayer.seekTo(startPositionInMills);
+                    }
+                }
             }
 
         } catch (IOException ex) { mReceivedError = true; }
@@ -343,6 +351,9 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        if (audioPlayer == null) {
+            return;
+        }
 
         setMediaChanging(false);
 
@@ -391,29 +402,33 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
 
                 while (isBound) {
 
-                    if (audioPlayer != null && audioPlayer.isPlaying()) {
+                    try {
+                        if (audioPlayer != null && audioPlayer.isPlaying()) {
 
-                        // Create update audio progress message.
-                        Message updateAudioProgressMsg = new Message();
+                            // Create update audio progress message.
+                            Message updateAudioProgressMsg = new Message();
 
-                        updateAudioProgressMsg.what = UPDATE_AUDIO_PROGRESS_BAR;
+                            updateAudioProgressMsg.what = UPDATE_AUDIO_PROGRESS_BAR;
 
-                        // Send the message to caller activity's update audio progressbar Handler object.
-                        audioProgressUpdateHandler.sendMessage(updateAudioProgressMsg);
+                            // Send the message to caller activity's update audio progressbar Handler object.
+                            audioProgressUpdateHandler.sendMessage(updateAudioProgressMsg);
 
-                        try {
+                            try {
 
-                            Thread.sleep(1000);
+                                Thread.sleep(1000);
 
-                        } catch (InterruptedException ex) { /* ignore */ }
+                            } catch (InterruptedException ex) { /* ignore */ }
 
-                    } else {
+                        } else {
 
-                        try {
+                            try {
 
-                            Thread.sleep(100);
+                                Thread.sleep(100);
 
-                        } catch (InterruptedException ex) { /* ignore */ }
+                            } catch (InterruptedException ex) { /* ignore */ }
+                        }
+                    } catch (Exception ex) {
+                        if (audioPlayer == null) break;
                     }
 
                     // Create update audio duration message.

@@ -168,11 +168,11 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
             }
             
             mediaURL = audioURL
-            if (isLoadingMode) {
-                self.flutterEventSink?(["name":"onLoadingCompleted"])
-            } else {
-                audioPlayer.play()
-            }
+            audioPlayer.play()
+            // if (isLoadingMode) {
+            //     self.flutterEventSink?(["name":"onLoadingCompleted"])
+            //     audioPlayer.pause()
+            // } 
         }
     }
     

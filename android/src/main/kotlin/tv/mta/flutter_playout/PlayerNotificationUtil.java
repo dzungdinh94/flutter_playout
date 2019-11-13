@@ -47,7 +47,7 @@ public class PlayerNotificationUtil  {
 
         builder.setContentTitle(description.getTitle())
                 .setContentText(description.getSubtitle())
-                .setLargeIcon(getLargeIamgeBitmap(description.getIconBitmap(), context))
+                .setLargeIcon(getLargeImageBitmap(description.getIconBitmap(), context))
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.getSessionToken()))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -77,7 +77,7 @@ public class PlayerNotificationUtil  {
         return PendingIntent.getBroadcast(context, mediaKeyEvent, intent, 0);
     }
 
-    private static Bitmap getLargeIamgeBitmap(Bitmap fromDes, Context context){
+    private static Bitmap getLargeImageBitmap(Bitmap fromDes, Context context){
         if(fromDes == null) {
             return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_play_default);
         }

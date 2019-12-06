@@ -140,6 +140,10 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
         this.isLoadingMode = isLoadingMode;
     }
 
+    public boolean getIsLoadingMode() {
+        return this.isLoadingMode;
+    }
+
 
     public boolean isStreamAudio() {
         return streamAudio;

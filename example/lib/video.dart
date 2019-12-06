@@ -25,9 +25,9 @@ class VideoPlayout extends StatelessWidget with PlayerObserver {
   }
 
   @override
-  void onPlay() {
+  void onPlay(bool isLoadingMode) {
     // TODO: implement onPlay
-    super.onPlay();
+    super.onPlay(isLoadingMode);
   }
 
   @override

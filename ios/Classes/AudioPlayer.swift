@@ -125,6 +125,8 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
     private var mediaDuration = 0.0
     
     private var mediaURL = ""
+
+    private var isPLayLoadingMode = false
     
     private func setup(title:String, subtitle:String, position:Double, url: String?, isLiveStream:Bool, isLoadingMode:Bool) {
 
@@ -168,6 +170,7 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
             }
             
             mediaURL = audioURL
+            isPLayLoadingMode = isLoadingMode
             audioPlayer.play()
             // if (isLoadingMode) {
             //     self.flutterEventSink?(["name":"onLoadingCompleted"])
@@ -222,7 +225,7 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
                     break
                 
                 case AVPlayerTimeControlStatus.playing:
-                    self.flutterEventSink?(["name":"onPlay"])
+                    self.flutterEventSink?(["name":"onPlay", "isLoadingMode": isPLayLoadingMode])
                     break
                 
                 case .waitingToPlayAtSpecifiedRate: break
@@ -340,7 +343,6 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
         pause()
         
         MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
-        print("teardown-----------------------------")
         if let timeObserver = timeObserverToken {
             //audioPlayer.removeTimeObserver(timeObserver)
             timeObserverToken = nil

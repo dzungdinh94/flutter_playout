@@ -21,7 +21,7 @@ mixin PlayerObserver {
   void onPause() {/* user implementation */}
 
   /// Override this method to get notifications when media is played.
-  void onPlay() {/* user implementation */}
+  void onPlay(bool isLoadingMode) {/* user implementation */}
 
   /// Override this method to get notifications when media has finished playing.
   void onComplete() {/* user implementation */}
@@ -45,7 +45,7 @@ mixin PlayerObserver {
   void onError(String error) {/* user implementation */}
 
   /// Trigger when user play audio with loading mode and audio loading completed
-  void onLoadingCompleted() {/* user implementation */}
+  void onLoadingCompleted(bool isLoadingMode) {/* user implementation */}
 
   void _processEvent(dynamic event) async {
     String eventName = event["name"];
@@ -59,7 +59,8 @@ mixin PlayerObserver {
 
       /* onPlay */
       case "onPlay":
-        onPlay();
+
+        onPlay(event["isLoadingMode"]);
         break;
 
       /* onComplete */
@@ -94,7 +95,7 @@ mixin PlayerObserver {
         break;
 
       case "onLoadingCompleted":
-        onLoadingCompleted();
+        onLoadingCompleted(event["isLoadingMode"]);
         break;
 
       default:

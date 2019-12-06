@@ -112,7 +112,7 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
                 } else if (msg.what == service.audioServiceBinder.UPDATE_PLAYER_STATE_TO_PLAY) {
 
-                    service.notifyDartOnPlay();
+                    service.notifyDartOnPlay(service.audioServiceBinder.getIsLoadingMode());
 
                 } else if (msg.what == service.audioServiceBinder.UPDATE_PLAYER_STATE_TO_COMPLETE) {
 
@@ -122,7 +122,7 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
                     service.onDuration();
                 } else if (msg.what == service.audioServiceBinder.AUDIO_LOADING_COMPLETED) {
-                    service.notifyDartOnLoadingCompleted();
+                    service.notifyDartOnLoadingCompleted(service.audioServiceBinder.getIsLoadingMode());
                 }
             }
         }
@@ -293,7 +293,7 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
             bindAudioService();
         }
 
-        notifyDartOnPlay();
+        notifyDartOnPlay(isLoadingMode);
     }
 
     void pause() {
@@ -306,13 +306,15 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
         notifyDartOnPause();
     }
 
-    void notifyDartOnPlay() {
+    void notifyDartOnPlay(boolean isLoadingMode) {
 
         try {
 
             JSONObject message = new JSONObject();
 
             message.put("name", "onPlay");
+
+            message.put("isLoadingMode", isLoadingMode);
 
             eventSink.success(message);
 
@@ -345,12 +347,14 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
         } catch (Exception e) { /* ignore */ }
     }
 
-    void notifyDartOnLoadingCompleted() {
+    void notifyDartOnLoadingCompleted(boolean isLoadingMode) {
         try {
 
             JSONObject message = new JSONObject();
 
             message.put("name", "onLoadingCompleted");
+
+            message.put("isLoadingMode", isLoadingMode);
 
             eventSink.success(message);
 

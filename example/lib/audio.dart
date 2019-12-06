@@ -47,7 +47,7 @@ class _AudioPlayout extends State<AudioPlayout> with PlayerObserver {
   }
 
   @override
-  void onPlay() {
+  void onPlay(bool isLoadingMode) {
     setState(() {
       audioPlayerState = PlayerState.PLAYING;
     });
@@ -87,6 +87,9 @@ class _AudioPlayout extends State<AudioPlayout> with PlayerObserver {
   @override
   void onError(String error) {
     super.onError(error);
+  }
+
+  @override void onLoadingCompleted(bool isLoadingMode) {
   }
 
   @override
@@ -195,8 +198,8 @@ class _AudioPlayout extends State<AudioPlayout> with PlayerObserver {
         title: widget.title,
         subtitle: widget.subtitle,
         position: currentPlaybackPosition,
-        largeIamgeUrl: "http://demo.fighttech.vn/app-english/ic_launcher.png",
-        isLiveStream: true);
+        isLiveStream: true, 
+        isLoadingMode: true);
     setState(() {
       audioPlayerState = PlayerState.PLAYING;
     });

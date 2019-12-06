@@ -385,14 +385,14 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
 
         setAudioMetadata();
 
+        Message updateAudioDurationMsg = new Message();
+
+        updateAudioDurationMsg.what = AUDIO_LOADING_COMPLETED;
+
+        audioProgressUpdateHandler.sendMessage(updateAudioDurationMsg);
+
         if(isLoadingMode) {
             updatePlaybackState(PlayerState.PAUSED);
-
-            Message updateAudioDurationMsg = new Message();
-
-            updateAudioDurationMsg.what = AUDIO_LOADING_COMPLETED;
-
-            audioProgressUpdateHandler.sendMessage(updateAudioDurationMsg);
         } else {
             setIsLoadingMode(false);
             updatePlaybackState(PlayerState.PLAYING);

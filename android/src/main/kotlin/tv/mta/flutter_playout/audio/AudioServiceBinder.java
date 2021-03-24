@@ -186,11 +186,19 @@ public class AudioServiceBinder extends Binder implements FlutterAVPlayer, Media
     }
 
     public void setAudioMetadata() {
-        MediaMetadataCompat metadata = new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
-                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
-                .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, Utils.getBitmapFromURL(largeImageUrl))
-                .build();
+        Utils utils = new Utils();
+        MediaMetadataCompat metadata = null;
+        try {
+            metadata = new MediaMetadataCompat.Builder()
+                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
+                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, utils.execute(largeImageUrl).get())
+                    .build();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         mMediaSessionCompat.setMetadata(metadata);
     }
